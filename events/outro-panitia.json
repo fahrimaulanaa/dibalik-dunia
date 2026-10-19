@@ -1,0 +1,23 @@
+{
+  "eventTitle": "DOKUMENTASI FTSL 2024",
+  "closingMessage": "SAMPAI JUMPA DI EVENT FTSL BERIKUTNYA!",
+  "credits": [
+    {
+      "role": "PROJECT OFFICER",
+      "names": ["Muhammad Maul", "Rian Hidayat"]
+    },
+    {
+      "role": "TIM MULTIMEDIA & DOKUMENTASI",
+      "names": ["Fahri Alamsyah", "Kevin Pratama", "Siti Rahma", "Anisa Putri"]
+    },
+    {
+      "role": "CREATIVE & MOTION DESIGN",
+      "names": ["Ahmad Fauzi", "Rizky Ramadhan"]
+    }
+  ],
+  "socials": {
+    "instagram": "@ftsl_itb",
+    "youtube": "FTSL ITB Channel",
+    "website": "ftsl.itb.ac.id"
+  }
+}

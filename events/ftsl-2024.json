@@ -1,0 +1,20 @@
+{
+  "eventTitle": "DOKUMENTASI FTSL 2024",
+  "subtitle": "Membangun Sinergi, Mengukir Prestasi Nyata",
+  "categoryTag": "OFFICIAL AFTERMOVIE",
+  "dateText": "19 OKTOBER 2026",
+  "locationText": "AULA BARAT ITB",
+  "sponsors": [
+    { "name": "MEDIA PARTNER", "badgeText": "KABAR KAMPUS" },
+    { "name": "SPONSORED BY", "badgeText": "BANK BNI" },
+    { "name": "SUPPORTED BY", "badgeText": "IKATAN ALUMNI" }
+  ],
+  "theme": {
+    "primaryColor": "#2563EB",
+    "secondaryColor": "#06B6D4",
+    "accentColor": "#F59E0B",
+    "backgroundColor": "#0A0F1D",
+    "himpunanName": "HIMPUNAN MAHASISWA TEKNIK SIPIL DAN LINGKUNGAN",
+    "himpunanShort": "HMS-ITB"
+  }
+}

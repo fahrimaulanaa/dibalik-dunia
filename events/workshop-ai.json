@@ -1,0 +1,20 @@
+{
+  "eventTitle": "NATIONAL AI WORKSHOP 2026",
+  "subtitle": "Eksplorasi Kecerdasan Buatan untuk Solusi Rekayasa Berkelanjutan",
+  "categoryTag": "WORKSHOP & SEMINAR",
+  "dateText": "25 NOVEMBER 2026",
+  "locationText": "AUDITORIUM CC TIMUR",
+  "sponsors": [
+    { "name": "MAIN SPONSOR", "badgeText": "GOOGLE CLOUD" },
+    { "name": "TECH PARTNER", "badgeText": "NVIDIA INDONESIA" },
+    { "name": "COMMUNITY", "badgeText": "AI SOCIETY" }
+  ],
+  "theme": {
+    "primaryColor": "#8B5CF6",
+    "secondaryColor": "#EC4899",
+    "accentColor": "#10B981",
+    "backgroundColor": "#090A1A",
+    "himpunanName": "HIMPUNAN MAHASISWA INFORMATIKA",
+    "himpunanShort": "HMIF"
+  }
+}

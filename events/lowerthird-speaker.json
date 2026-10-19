@@ -1,0 +1,12 @@
+{
+  "speakerName": "Prof. Ir. Bambang Sujatmo, Ph.D.",
+  "speakerRole": "Ketua Kelompok Keahlian Rekayasa Struktur",
+  "organization": "FTSL ITB",
+  "socialHandle": "@prof.bambang",
+  "showDemoBackground": true,
+  "theme": {
+    "primaryColor": "#2563EB",
+    "secondaryColor": "#06B6D4",
+    "accentColor": "#F59E0B"
+  }
+}
