@@ -11,6 +11,7 @@ import {
   useVideoConfig,
 } from 'remotion';
 import timelineData from '../content/timeline.json';
+import { DynamicSubtitle } from '../components/DynamicSubtitle';
 import { FONT_FAMILY } from '../styles/fonts';
 
 export interface SceneItem {
@@ -45,7 +46,59 @@ interface MainVideoProps {
   timeline?: TimelineData;
 }
 
-// Scene Visual Renderer with Extended Animation Support
+// Cinematic Ambient Motion Graphics Particles Layer
+const AmbientMotionOverlay: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+
+  // 6 floating bokeh orbs for high-end cinematic motion graphics
+  const orbs = [
+    { x: 20, y: 35, size: 300, color: 'rgba(245, 158, 11, 0.12)', speed: 0.8 },
+    { x: 80, y: 65, size: 400, color: 'rgba(59, 130, 246, 0.15)', speed: 0.6 },
+    { x: 50, y: 85, size: 350, color: 'rgba(234, 88, 12, 0.14)', speed: 0.9 },
+  ];
+
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none', overflow: 'hidden' }}>
+      {orbs.map((orb, i) => {
+        const floatX = orb.x + Math.sin(t * orb.speed + i) * 6;
+        const floatY = orb.y + Math.cos(t * orb.speed * 0.8 + i) * 8;
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: `${floatX}%`,
+              top: `${floatY}%`,
+              width: orb.size,
+              height: orb.size,
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${orb.color} 0%, transparent 70%)`,
+              filter: 'blur(40px)',
+              transform: 'translate(-50%, -50%)',
+            }}
+          />
+        );
+      })}
+
+      {/* Subtle sweeping light leak overlay */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: `radial-gradient(ellipse at ${50 + Math.sin(t * 1.2) * 20}% ${40 + Math.cos(t) * 15}%, rgba(254, 240, 138, 0.08) 0%, transparent 60%)`,
+          mixBlendMode: 'screen',
+        }}
+      />
+    </AbsoluteFill>
+  );
+};
+
+// Scene Visual Renderer with Professional Camera Movements & Animations
 const SceneVisual: React.FC<{
   visual: string;
   animation: string;
@@ -56,53 +109,60 @@ const SceneVisual: React.FC<{
 
   const anim = animation.toLowerCase();
 
-  let scale = 1;
+  let scale = 1.0;
   let translateX = 0;
   let translateY = 0;
+  let rotate = 0;
   let filter = 'none';
 
+  // Professional camera motions per animation type
   if (anim.includes('slow-scale-up') || anim === 'zoom-in') {
-    scale = interpolate(frame, [0, durationInFrames], [1, 1.15], {
+    // Dolly in with smooth breathing
+    scale = interpolate(frame, [0, durationInFrames], [1.02, 1.18], {
       extrapolateRight: 'clamp',
     });
+    translateY = interpolate(frame, [0, durationInFrames], [0, -25]);
   } else if (anim.includes('pan-up')) {
-    translateY = interpolate(frame, [0, durationInFrames], [40, -40], {
+    translateY = interpolate(frame, [0, durationInFrames], [60, -60], {
       extrapolateRight: 'clamp',
     });
-    scale = 1.08;
+    scale = 1.12;
   } else if (anim.includes('pan-right')) {
-    translateX = interpolate(frame, [0, durationInFrames], [-50, 50], {
+    translateX = interpolate(frame, [0, durationInFrames], [-60, 60], {
       extrapolateRight: 'clamp',
     });
-    scale = 1.08;
+    scale = 1.12;
   } else if (anim.includes('glow-pulse')) {
+    // Heat pulsing wave
     const pulse = Math.sin((frame / fps) * 6) * 0.04;
-    scale = 1.05 + pulse;
-    const brightness = 1 + Math.sin((frame / fps) * 8) * 0.15;
-    filter = `brightness(${brightness})`;
+    scale = 1.08 + pulse;
+    const brightness = 1 + Math.sin((frame / fps) * 8) * 0.18;
+    filter = `brightness(${brightness}) contrast(1.05)`;
   } else if (anim.includes('parallax-float')) {
-    translateX = Math.sin((frame / fps) * 2) * 15;
-    translateY = Math.cos((frame / fps) * 2.5) * 15;
-    scale = 1.06;
+    translateX = Math.sin((frame / fps) * 1.8) * 20;
+    translateY = Math.cos((frame / fps) * 2.2) * 18;
+    rotate = Math.sin((frame / fps) * 1.5) * 1.2;
+    scale = 1.1;
   } else if (anim.includes('spring-bounce')) {
     const bounce = spring({
       frame: Math.max(0, frame - 5),
       fps,
-      config: { damping: 10, stiffness: 100 },
+      config: { damping: 11, stiffness: 90 },
     });
-    scale = interpolate(bounce, [0, 1], [0.85, 1.03]);
+    scale = interpolate(bounce, [0, 1], [0.85, 1.05]);
   } else {
-    scale = interpolate(frame, [0, durationInFrames], [1, 1.06]);
+    // Default cinematic slow drift
+    scale = interpolate(frame, [0, durationInFrames], [1.02, 1.09]);
   }
 
   // Cross-fade transitions
-  const fadeIn = interpolate(frame, [0, 25], [0, 1], {
+  const fadeIn = interpolate(frame, [0, 20], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - 25, durationInFrames],
+    [durationInFrames - 20, durationInFrames],
     [1, 0],
     {
       extrapolateLeft: 'clamp',
@@ -111,7 +171,7 @@ const SceneVisual: React.FC<{
   );
   const opacity = Math.min(fadeIn, fadeOut);
 
-  // Fallback support: if .png was specified in markdown, seamlessly match .svg
+  // Fallback: match .svg if .png was specified in markdown
   let resolvedVisual = visual;
   if (resolvedVisual.endsWith('.png')) {
     resolvedVisual = resolvedVisual.replace(/\.png$/, '.svg');
@@ -140,13 +200,13 @@ const SceneVisual: React.FC<{
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          transform: `scale(${scale}) translate(${translateX}px, ${translateY}px)`,
+          transform: `scale(${scale}) translate(${translateX}px, ${translateY}px) rotate(${rotate}deg)`,
           transformOrigin: 'center center',
           filter,
         }}
       />
 
-      {/* Cinematic dark gradient vignette for enhanced subtitle contrast */}
+      {/* Cinematic dark vignette overlay for optimal subtitle readability */}
       <div
         style={{
           position: 'absolute',
@@ -155,93 +215,10 @@ const SceneVisual: React.FC<{
           width: '100%',
           height: '100%',
           background:
-            'linear-gradient(180deg, rgba(5,8,16,0.65) 0%, transparent 30%, rgba(5,8,16,0.2) 60%, rgba(5,8,16,0.94) 100%)',
+            'linear-gradient(180deg, rgba(5,8,16,0.6) 0%, transparent 28%, rgba(5,8,16,0.15) 60%, rgba(5,8,16,0.92) 100%)',
           pointerEvents: 'none',
         }}
       />
-    </div>
-  );
-};
-
-// Modern Dynamic Subtitle Component
-const DynamicSubtitle: React.FC<{
-  text: string;
-  durationInFrames: number;
-}> = ({ text, durationInFrames }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-
-  // Spring entrance pop
-  const popSpring = spring({
-    frame: Math.max(0, frame - 10),
-    fps,
-    config: { damping: 14, stiffness: 120 },
-  });
-
-  const translateY = interpolate(popSpring, [0, 1], [35, 0]);
-  const opacity = interpolate(popSpring, [0, 1], [0, 1]);
-
-  // Fade out before scene ends
-  const exitOpacity = interpolate(
-    frame,
-    [durationInFrames - 20, durationInFrames],
-    [1, 0],
-    {
-      extrapolateLeft: 'clamp',
-      extrapolateRight: 'clamp',
-    }
-  );
-
-  // Auto-scale subtitle size for long texts (e.g. 250+ characters)
-  const textLength = text.length;
-  const fontSize = textLength > 180 ? 30 : textLength > 120 ? 34 : 40;
-  const lineHeight = textLength > 180 ? 1.3 : 1.35;
-
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: 300, // Safe zone above TikTok / Reels bottom interactive UI
-        left: 48,
-        right: 48,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        transform: `translateY(${translateY}px)`,
-        opacity: Math.min(opacity, exitOpacity),
-        pointerEvents: 'none',
-      }}
-    >
-      <div
-        style={{
-          background: 'rgba(15, 23, 42, 0.92)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1.5px solid rgba(253, 224, 71, 0.45)', // glowing warm yellow accent
-          boxShadow:
-            '0 24px 56px rgba(0, 0, 0, 0.8), 0 0 28px rgba(253, 224, 71, 0.25)',
-          borderRadius: 24,
-          padding: '24px 36px',
-          maxWidth: '960px',
-          textAlign: 'center',
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontFamily: FONT_FAMILY.heading,
-            fontSize,
-            fontWeight: 800,
-            color: '#FFFFFF',
-            lineHeight,
-            letterSpacing: '0.4px',
-            textShadow: '0 2px 14px rgba(0,0,0,0.8)',
-            wordBreak: 'break-word',
-          }}
-        >
-          {text}
-        </p>
-      </div>
     </div>
   );
 };
@@ -281,10 +258,13 @@ export const MainVideo: React.FC<MainVideoProps> = ({
             height: '100%',
             width: `${progressPercent}%`,
             background: 'linear-gradient(90deg, #3B82F6 0%, #EAB308 100%)',
-            boxShadow: '0 0 14px #EAB308',
+            boxShadow: '0 0 16px #EAB308',
           }}
         />
       </div>
+
+      {/* Ambient Motion Graphics Overlay */}
+      <AmbientMotionOverlay />
 
       {/* Render Dynamic Sequences from Markdown Timeline */}
       {timeline.scenes.map((scene) => {
@@ -299,7 +279,7 @@ export const MainVideo: React.FC<MainVideoProps> = ({
               <Audio src={staticFile(scene.audioFile)} volume={1.0} />
             )}
 
-            {/* 2. Animated Visual Element */}
+            {/* 2. Animated Visual Element with Camera Moves */}
             <SceneVisual
               visual={scene.visual}
               animation={scene.animation}
@@ -345,9 +325,10 @@ export const MainVideo: React.FC<MainVideoProps> = ({
               </span>
             </div>
 
-            {/* 4. Subtitle Text Overlay */}
+            {/* 4. Professional Word-by-Word Dynamic Subtitle Pop-up */}
             <DynamicSubtitle
               text={scene.text}
+              startFrame={10}
               durationInFrames={scene.durationInFrames}
             />
           </Sequence>
