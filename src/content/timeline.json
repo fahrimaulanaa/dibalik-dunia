@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "sourceFile": "brief-lampu.md",
+    "generatedAt": "2026-10-19T14:09:34.678Z",
+    "fps": 60,
+    "width": 1080,
+    "height": 1920,
+    "totalDurationInSeconds": 15,
+    "totalDurationInFrames": 900
+  },
+  "scenes": [
+    {
+      "id": "scene-1",
+      "sceneNumber": 1,
+      "startAtSecond": 0,
+      "endAtSecond": 5,
+      "durationSeconds": 5,
+      "fromFrame": 0,
+      "durationInFrames": 300,
+      "visual": "intro-lampu.svg",
+      "animation": "zoom-in",
+      "text": "Pernah kepikiran nggak, gimana ceritanya lampu pijar bisa menyala terang?",
+      "audioFile": "audio/scene-1-tts.mp3"
+    },
+    {
+      "id": "scene-2",
+      "sceneNumber": 2,
+      "startAtSecond": 5,
+      "endAtSecond": 15,
+      "durationSeconds": 10,
+      "fromFrame": 300,
+      "durationInFrames": 600,
+      "visual": "filamen.svg",
+      "animation": "pan-right",
+      "text": "Kuncinya ada di kawat tipis ini, namanya filamen tungsten.",
+      "audioFile": "audio/scene-2-tts.mp3"
+    }
+  ]
+}

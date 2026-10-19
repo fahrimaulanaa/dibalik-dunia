@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <radialGradient id="filamenBg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#451A03" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#180B02" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#050302" stop-opacity="1"/>
+    </radialGradient>
+    <filter id="intenseGlow">
+      <feGaussianBlur stdDeviation="25" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1080" height="1920" fill="url(#filamenBg)"/>
+
+  <!-- Macro Depth Lines -->
+  <line x1="200" y1="0" x2="200" y2="1920" stroke="rgba(255,255,255,0.02)" stroke-width="2"/>
+  <line x1="880" y1="0" x2="880" y2="1920" stroke="rgba(255,255,255,0.02)" stroke-width="2"/>
+
+  <!-- Support Wires (Molybdenum leads) -->
+  <path d="M 320,1350 L 320,850" stroke="#78716C" stroke-width="14" stroke-linecap="round"/>
+  <path d="M 760,1350 L 760,850" stroke="#78716C" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Glowing Tungsten Filament Coiled Spring Wave -->
+  <g filter="url(#intenseGlow)">
+    <!-- Ambient Heat Glow -->
+    <path d="M 320,850 Q 540,700 760,850" 
+          fill="none" 
+          stroke="#EA580C" 
+          stroke-width="50" 
+          stroke-linecap="round" 
+          opacity="0.6"/>
+
+    <!-- Bright Coiled Segment -->
+    <path d="M 320,850 
+             C 360,800 370,900 410,850 
+             C 450,800 460,900 500,850 
+             C 540,800 550,900 590,850 
+             C 630,800 640,900 680,850 
+             C 720,800 730,900 760,850" 
+          fill="none" 
+          stroke="#FDE047" 
+          stroke-width="18" 
+          stroke-linecap="round"/>
+
+    <!-- Super White Hot Core -->
+    <path d="M 320,850 
+             C 360,800 370,900 410,850 
+             C 450,800 460,900 500,850 
+             C 540,800 550,900 590,850 
+             C 630,800 640,900 680,850 
+             C 720,800 730,900 760,850" 
+          fill="none" 
+          stroke="#FFFFFF" 
+          stroke-width="8" 
+          stroke-linecap="round"/>
+  </g>
+
+  <!-- Technical Spec Label -->
+  <text x="540" y="1120" text-anchor="middle" fill="#FDBA74" font-size="28" font-family="monospace" letter-spacing="4px" font-weight="700">
+    TUNGSTEN FILAMENT (W) • ~2500°C
+  </text>
+</svg>

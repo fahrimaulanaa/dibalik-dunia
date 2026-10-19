@@ -1,7 +1,9 @@
 import React from 'react';
 import { Composition } from 'remotion';
+import timelineData from './content/timeline.json';
 import { IntroSequence } from './compositions/IntroSequence';
 import { LowerThird } from './compositions/LowerThird';
+import { MainVideo } from './compositions/MainVideo';
 import { OutroCredits } from './compositions/OutroCredits';
 import {
   IntroPropsSchema,
@@ -17,9 +19,25 @@ const VIDEO_CONFIG = {
 };
 
 export const RemotionRoot: React.FC = () => {
+  // Dynamic duration calculated from markdown timeline
+  const mainVideoDuration = timelineData?.metadata?.totalDurationInFrames || 900;
+
   return (
     <>
-      {/* 1. Intro Video (Locked: 9x16 60 FPS, 300 frames = 5 detik) */}
+      {/* 1. Markdown-Driven Main Video (Locked: 9x16 60 FPS, Dynamic duration from timeline.json) */}
+      <Composition
+        id="MainVideo"
+        component={MainVideo}
+        durationInFrames={mainVideoDuration}
+        fps={VIDEO_CONFIG.fps}
+        width={VIDEO_CONFIG.width}
+        height={VIDEO_CONFIG.height}
+        defaultProps={{
+          timeline: timelineData,
+        }}
+      />
+
+      {/* 2. Intro Video (Locked: 9x16 60 FPS, 300 frames = 5 detik) */}
       <Composition
         id="Intro"
         component={IntroSequence}
@@ -57,7 +75,7 @@ export const RemotionRoot: React.FC = () => {
         }}
       />
 
-      {/* 2. Lower Third (Locked: 9x16 60 FPS, 420 frames = 7 detik) */}
+      {/* 3. Lower Third (Locked: 9x16 60 FPS, 420 frames = 7 detik) */}
       <Composition
         id="LowerThird"
         component={LowerThird}
@@ -91,7 +109,7 @@ export const RemotionRoot: React.FC = () => {
         }}
       />
 
-      {/* 3. Outro Credits (Locked: 9x16 60 FPS, 600 frames = 10 detik) */}
+      {/* 4. Outro Credits (Locked: 9x16 60 FPS, 600 frames = 10 detik) */}
       <Composition
         id="OutroCredits"
         component={OutroCredits}
