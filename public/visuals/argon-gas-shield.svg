@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <radialGradient id="argonBg" cx="50%" cy="48%" r="65%">
+      <stop offset="0%" stop-color="#4C1D95" stop-opacity="0.8"/>
+      <stop offset="45%" stop-color="#1E1B4B" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#040308" stop-opacity="1"/>
+    </radialGradient>
+    <radialGradient id="plasmaAura" cx="50%" cy="48%" r="45%">
+      <stop offset="0%" stop-color="#C084FC" stop-opacity="0.7"/>
+      <stop offset="40%" stop-color="#818CF8" stop-opacity="0.45"/>
+      <stop offset="70%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shieldGlow">
+      <feGaussianBlur stdDeviation="20" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#argonBg)"/>
+
+  <!-- Protective Gas Cloud Aura -->
+  <circle cx="540" cy="850" r="420" fill="url(#plasmaAura)"/>
+
+  <!-- Shield Boundary Ring -->
+  <circle cx="540" cy="850" r="320" fill="none" stroke="#C084FC" stroke-width="4" stroke-dasharray="8 8" opacity="0.6"/>
+
+  <!-- Protected Glowing Filament Inside -->
+  <g filter="url(#shieldGlow)">
+    <path d="M 320,850 Q 540,740 760,850" 
+          fill="none" 
+          stroke="#FDE047" 
+          stroke-width="16" 
+          stroke-linecap="round"/>
+  </g>
+
+  <!-- Gas Molecules -->
+  <g fill="#A855F7">
+    <circle cx="380" cy="700" r="14" opacity="0.75"/>
+    <circle cx="700" cy="720" r="12" opacity="0.75"/>
+    <circle cx="650" cy="980" r="15" opacity="0.8"/>
+    <circle cx="420" cy="990" r="13" opacity="0.8"/>
+    <circle cx="540" cy="620" r="16" opacity="0.9"/>
+  </g>
+
+  <!-- Label Badge -->
+  <rect x="290" y="1120" width="500" height="80" rx="40" fill="#0F172A" stroke="#C084FC" stroke-width="3"/>
+  <text x="540" y="1172" text-anchor="middle" fill="#E9D5FF" font-size="28" font-family="monospace" font-weight="800" letter-spacing="3px">
+    🛡️ ARGON GAS SHIELD (Ar)
+  </text>
+</svg>

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <radialGradient id="channelBg" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#0F172A" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#020617" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+    <filter id="logoGlow">
+      <feGaussianBlur stdDeviation="25" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#channelBg)"/>
+
+  <!-- Halo Ring -->
+  <circle cx="540" cy="850" r="300" fill="none" stroke="url(#brandGradient)" stroke-width="4" stroke-dasharray="12 12" opacity="0.6"/>
+
+  <!-- Center Emblem -->
+  <g filter="url(#logoGlow)">
+    <circle cx="540" cy="850" r="180" fill="#0F172A" stroke="url(#brandGradient)" stroke-width="8"/>
+    <!-- Mystery Globe / Eye of Science Icon -->
+    <circle cx="540" cy="850" r="110" fill="none" stroke="#FDE047" stroke-width="6"/>
+    <path d="M 430,850 Q 540,780 650,850 Q 540,920 430,850 Z" fill="#FDE047" opacity="0.3"/>
+    <circle cx="540" cy="850" r="35" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Channel Name -->
+  <text x="540" y="1120" text-anchor="middle" fill="#FFFFFF" font-size="52" font-family="sans-serif" font-weight="900" letter-spacing="4px">
+    DIBALIK DUNIA
+  </text>
+  <text x="540" y="1170" text-anchor="middle" fill="#94A3B8" font-size="24" font-family="sans-serif" font-weight="600" letter-spacing="3px">
+    BONGKAR RAHASIA SAINS &amp; TEKNOLOGI
+  </text>
+
+  <!-- Subscribe Pill -->
+  <rect x="360" y="1230" width="360" height="74" rx="37" fill="#EF4444" stroke="#DC2626" stroke-width="2"/>
+  <text x="540" y="1278" text-anchor="middle" fill="#FFFFFF" font-size="28" font-family="sans-serif" font-weight="800" letter-spacing="2px">
+    ▶ SUBSCRIBE
+  </text>
+</svg>

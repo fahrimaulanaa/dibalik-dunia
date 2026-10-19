@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <radialGradient id="darkBg" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#1E1B4B" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#0F0D1E" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#030206" stop-opacity="1"/>
+    </radialGradient>
+    <radialGradient id="softGlow" cx="50%" cy="46%" r="28%">
+      <stop offset="0%" stop-color="#FEF08A" stop-opacity="0.85"/>
+      <stop offset="30%" stop-color="#EAB308" stop-opacity="0.4"/>
+      <stop offset="70%" stop-color="#CA8A04" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="bulbBlur">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#darkBg)"/>
+
+  <!-- Soft Awakening Glow -->
+  <circle cx="540" cy="880" r="380" fill="url(#softGlow)"/>
+
+  <!-- Macro Glass Bulb Contours -->
+  <g filter="url(#bulbBlur)">
+    <!-- Bulb Glass Outline in Darkness -->
+    <path d="M 540,540 C 400,540 310,650 310,790 C 310,910 400,1000 430,1080 L 430,1160 L 650,1160 L 650,1080 C 680,1000 770,910 770,790 C 770,650 680,540 540,540 Z" 
+          fill="none" 
+          stroke="rgba(254, 240, 138, 0.45)" 
+          stroke-width="5"/>
+    
+    <!-- Delicate Filament Starting to Glow -->
+    <path d="M 480,980 L 510,810 L 530,750 L 540,810 L 550,750 L 570,810 L 600,980" 
+          fill="none" 
+          stroke="#FACC15" 
+          stroke-width="7" 
+          stroke-linecap="round"/>
+  </g>
+
+  <!-- Brass Threaded Base -->
+  <rect x="430" y="1160" width="220" height="32" rx="10" fill="#334155" stroke="#475569" stroke-width="3"/>
+  <rect x="435" y="1200" width="210" height="32" rx="10" fill="#1E293B" stroke="#334155" stroke-width="3"/>
+  <rect x="440" y="1240" width="200" height="32" rx="10" fill="#0F172A" stroke="#1E293B" stroke-width="3"/>
+
+  <!-- Subtle Cinematic Dust Particles -->
+  <circle cx="340" cy="720" r="4" fill="#FEF08A" opacity="0.6"/>
+  <circle cx="750" cy="840" r="5" fill="#FEF08A" opacity="0.4"/>
+  <circle cx="480" cy="620" r="3" fill="#FFFFFF" opacity="0.5"/>
+</svg>

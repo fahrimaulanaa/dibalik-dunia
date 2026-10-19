@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <radialGradient id="infernoBg" cx="50%" cy="48%" r="65%">
+      <stop offset="0%" stop-color="#DC2626" stop-opacity="0.9"/>
+      <stop offset="45%" stop-color="#7C2D12" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0F0503" stop-opacity="1"/>
+    </radialGradient>
+    <radialGradient id="plasmaBall" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="30%" stop-color="#FEF08A" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="#EA580C" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#7C2D12" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blaze">
+      <feGaussianBlur stdDeviation="30" result="fire"/>
+      <feMerge>
+        <feMergeNode in="fire"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#infernoBg)"/>
+
+  <!-- Extreme Plasma Glow -->
+  <circle cx="540" cy="850" r="450" fill="url(#plasmaBall)"/>
+
+  <!-- White Hot Filament Core -->
+  <g filter="url(#blaze)">
+    <path d="M 180,850 Q 540,680 900,850" 
+          fill="none" 
+          stroke="#FFFFFF" 
+          stroke-width="32" 
+          stroke-linecap="round"/>
+    <path d="M 180,850 Q 540,680 900,850" 
+          fill="none" 
+          stroke="#FACC15" 
+          stroke-width="50" 
+          stroke-linecap="round" 
+          opacity="0.7"/>
+  </g>
+
+  <!-- Swarming Electrons / Sparks -->
+  <circle cx="360" cy="780" r="8" fill="#FFFFFF"/>
+  <circle cx="480" cy="720" r="10" fill="#FFFFFF"/>
+  <circle cx="620" cy="740" r="9" fill="#FFFFFF"/>
+  <circle cx="720" cy="810" r="8" fill="#FFFFFF"/>
+  <circle cx="280" cy="900" r="6" fill="#FDE047"/>
+  <circle cx="820" cy="890" r="7" fill="#FDE047"/>
+  <circle cx="530" cy="650" r="5" fill="#FFFFFF"/>
+
+  <!-- Temperature Badge -->
+  <rect x="340" y="1080" width="400" height="80" rx="40" fill="#18181B" stroke="#EF4444" stroke-width="3"/>
+  <text x="540" y="1132" text-anchor="middle" fill="#FEF08A" font-size="32" font-family="monospace" font-weight="900" letter-spacing="2px">
+    🔥 2500°C HEAT
+  </text>
+</svg>

@@ -4,56 +4,86 @@ const googleTTS = require('google-tts-api');
 
 const FPS = 60;
 
-// Function to generate TTS audio and save to public/audio/
+// Function to generate TTS audio using getAllAudioBase64 to safely handle long sentences (>200 chars)
 async function generateTTS(text, filename, lang = 'id') {
   const audioDir = path.join(__dirname, '..', 'public', 'audio');
   fs.mkdirSync(audioDir, { recursive: true });
   const outPath = path.join(audioDir, filename);
 
-  console.log(`🎙️  Generating TTS for "${filename}" [${lang}]: "${text}"`);
-  const b64 = await googleTTS.getAudioBase64(text, { lang, slow: false });
-  fs.writeFileSync(outPath, Buffer.from(b64, 'base64'));
-  console.log(`✅ Saved TTS: public/audio/${filename}`);
-  return `audio/${filename}`;
+  console.log(`🎙️  Generating TTS for "${filename}" (${text.length} chars) [${lang}]...`);
+
+  try {
+    // Use getAllAudioBase64 to prevent the 200-char limit exception in Google TTS
+    const results = await googleTTS.getAllAudioBase64(text, {
+      lang,
+      slow: false,
+      timeout: 10000,
+      splitPunct: '.,!?:;',
+    });
+
+    const buffers = results.map((r) => Buffer.from(r.base64, 'base64'));
+    const combinedBuffer = Buffer.concat(buffers);
+
+    fs.writeFileSync(outPath, combinedBuffer);
+    console.log(`✅ Saved TTS: public/audio/${filename} (${combinedBuffer.length} bytes)`);
+    return `audio/${filename}`;
+  } catch (err) {
+    console.error(`⚠️  TTS generation failed for ${filename}:`, err.message);
+    // If audio exists, reuse it, otherwise write empty buffer
+    if (!fs.existsSync(outPath)) {
+      fs.writeFileSync(outPath, Buffer.alloc(0));
+    }
+    return `audio/${filename}`;
+  }
 }
 
-// Function to parse the Markdown content into scenes
+// Robust Markdown Parser for Scene blocks
 function parseMarkdown(mdContent) {
-  // Split content by scene headers (e.g. ## Scene 1, ## Scene 2)
-  const sceneBlocks = mdContent
-    .split(/^##\s+Scene\s+/im)
-    .filter((block) => block.trim().length > 0);
-
   const scenes = [];
 
-  for (let i = 0; i < sceneBlocks.length; i++) {
-    const block = sceneBlocks[i];
-    const lines = block.split('\n').map((line) => line.trim());
+  // Match all ## Scene [N] blocks
+  const sceneRegex = /##\s+Scene\s+(\d+)\s*\r?\n([\s\S]*?)(?=(?:##\s+Scene\s+\d+|$))/gi;
+  let match;
 
-    // Extract scene number (from the first line of the block if it started with the number)
-    const firstLineMatch = lines[0].match(/^(\d+)/);
-    const sceneNumber = firstLineMatch ? parseInt(firstLineMatch[1], 10) : i + 1;
+  while ((match = sceneRegex.exec(mdContent)) !== null) {
+    const sceneNumber = parseInt(match[1], 10);
+    const blockContent = match[2];
 
-    let startAtSecond = 0;
-    let endAtSecond = 5;
-    let visual = '';
+    // Extract Waktu
+    let startAtSecond = (sceneNumber - 1) * 5;
+    let endAtSecond = sceneNumber * 5;
+    const waktuMatch = blockContent.match(/Waktu\s*:\s*(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)/i);
+    if (waktuMatch) {
+      startAtSecond = parseFloat(waktuMatch[1]);
+      endAtSecond = parseFloat(waktuMatch[2]);
+    }
+
+    // Extract Visual
+    let visual = `scene-${sceneNumber}.png`;
+    const visualMatch = blockContent.match(/Visual\s*:\s*([^\r\n]+)/i);
+    if (visualMatch) {
+      visual = visualMatch[1].trim();
+    }
+
+    // Extract Animasi
     let animation = 'zoom-in';
-    let text = '';
+    const animMatch = blockContent.match(/Animasi\s*:\s*([^\r\n]+)/i);
+    if (animMatch) {
+      animation = animMatch[1].trim();
+    }
 
-    for (const line of lines) {
-      if (/^waktu\s*:/i.test(line)) {
-        const timeMatch = line.match(/^waktu\s*:\s*(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)/i);
-        if (timeMatch) {
-          startAtSecond = parseFloat(timeMatch[1]);
-          endAtSecond = parseFloat(timeMatch[2]);
-        }
-      } else if (/^visual\s*:/i.test(line)) {
-        visual = line.replace(/^visual\s*:\s*/i, '').trim();
-      } else if (/^animasi\s*:/i.test(line)) {
-        animation = line.replace(/^animasi\s*:\s*/i, '').trim().toLowerCase();
-      } else if (/^teks\s*:/i.test(line)) {
-        text = line.replace(/^teks\s*:\s*/i, '').trim();
-      }
+    // Extract Teks (handles multi-line text and stops before Catatan: or next section)
+    let text = '';
+    const textMatch = blockContent.match(/Teks\s*:\s*([\s\S]+?)(?=(?:\r?\n\s*(?:Catatan|Visual|Animasi|Waktu|##|$)))/i);
+    if (textMatch) {
+      text = textMatch[1].replace(/\r?\n/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    // Extract optional Catatan (Notes)
+    let notes = '';
+    const notesMatch = blockContent.match(/Catatan\s*:\s*([^\r\n]+)/i);
+    if (notesMatch) {
+      notes = notesMatch[1].trim();
     }
 
     const durationSeconds = Math.max(1, endAtSecond - startAtSecond);
@@ -72,6 +102,7 @@ function parseMarkdown(mdContent) {
       visual,
       animation,
       text,
+      notes,
       audioFile: `audio/${audioFileName}`,
     });
   }
@@ -95,9 +126,14 @@ async function syncMarkdown() {
   const mdContent = fs.readFileSync(inputMdPath, 'utf-8');
   const scenes = parseMarkdown(mdContent);
 
+  if (scenes.length === 0) {
+    console.error('❌ No scenes found! Please check markdown format (e.g. ## Scene 1)');
+    process.exit(1);
+  }
+
   console.log(`Found ${scenes.length} scenes. Generating TTS audio...\n`);
 
-  // Generate TTS for each scene
+  // Generate TTS for each scene sequentially
   for (const scene of scenes) {
     if (scene.text) {
       const audioFileName = `scene-${scene.sceneNumber}-tts.mp3`;
@@ -105,7 +141,7 @@ async function syncMarkdown() {
     }
   }
 
-  // Calculate total duration
+  // Calculate total video duration from scenes
   const totalDurationInSeconds = Math.max(
     ...scenes.map((s) => s.endAtSecond),
     0
@@ -121,6 +157,7 @@ async function syncMarkdown() {
       height: 1920,
       totalDurationInSeconds,
       totalDurationInFrames,
+      sceneCount: scenes.length,
     },
     scenes,
   };
@@ -138,6 +175,7 @@ async function syncMarkdown() {
 
   console.log(`\n========================================`);
   console.log(`✅ Success! Timeline generated: ${outputJsonPath}`);
+  console.log(`Total Scenes: ${scenes.length}`);
   console.log(`Total Duration: ${totalDurationInSeconds}s (${totalDurationInFrames} frames @ ${FPS} FPS)`);
   console.log(`========================================\n`);
 }

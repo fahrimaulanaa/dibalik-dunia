@@ -24,6 +24,7 @@ export interface SceneItem {
   visual: string;
   animation: string;
   text: string;
+  notes?: string;
   audioFile: string;
 }
 
@@ -35,6 +36,7 @@ export interface TimelineData {
     height: number;
     totalDurationInSeconds: number;
     totalDurationInFrames: number;
+    sceneCount?: number;
   };
   scenes: SceneItem[];
 }
@@ -43,50 +45,64 @@ interface MainVideoProps {
   timeline?: TimelineData;
 }
 
-// Scene Visual Renderer with Dynamic Animation (zoom-in, pan-right, etc.)
+// Scene Visual Renderer with Extended Animation Support
 const SceneVisual: React.FC<{
   visual: string;
   animation: string;
   durationInFrames: number;
 }> = ({ visual, animation, durationInFrames }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
 
-  // Animation logic
+  const anim = animation.toLowerCase();
+
   let scale = 1;
   let translateX = 0;
   let translateY = 0;
+  let filter = 'none';
 
-  if (animation === 'zoom-in') {
-    scale = interpolate(frame, [0, durationInFrames], [1, 1.14], {
+  if (anim.includes('slow-scale-up') || anim === 'zoom-in') {
+    scale = interpolate(frame, [0, durationInFrames], [1, 1.15], {
       extrapolateRight: 'clamp',
     });
-  } else if (animation === 'zoom-out') {
-    scale = interpolate(frame, [0, durationInFrames], [1.14, 1], {
-      extrapolateRight: 'clamp',
-    });
-  } else if (animation === 'pan-right') {
-    translateX = interpolate(frame, [0, durationInFrames], [-50, 50], {
-      extrapolateRight: 'clamp',
-    });
-    scale = 1.08; // slightly enlarged so panning doesn't reveal edges
-  } else if (animation === 'pan-left') {
-    translateX = interpolate(frame, [0, durationInFrames], [50, -50], {
+  } else if (anim.includes('pan-up')) {
+    translateY = interpolate(frame, [0, durationInFrames], [40, -40], {
       extrapolateRight: 'clamp',
     });
     scale = 1.08;
+  } else if (anim.includes('pan-right')) {
+    translateX = interpolate(frame, [0, durationInFrames], [-50, 50], {
+      extrapolateRight: 'clamp',
+    });
+    scale = 1.08;
+  } else if (anim.includes('glow-pulse')) {
+    const pulse = Math.sin((frame / fps) * 6) * 0.04;
+    scale = 1.05 + pulse;
+    const brightness = 1 + Math.sin((frame / fps) * 8) * 0.15;
+    filter = `brightness(${brightness})`;
+  } else if (anim.includes('parallax-float')) {
+    translateX = Math.sin((frame / fps) * 2) * 15;
+    translateY = Math.cos((frame / fps) * 2.5) * 15;
+    scale = 1.06;
+  } else if (anim.includes('spring-bounce')) {
+    const bounce = spring({
+      frame: Math.max(0, frame - 5),
+      fps,
+      config: { damping: 10, stiffness: 100 },
+    });
+    scale = interpolate(bounce, [0, 1], [0.85, 1.03]);
   } else {
-    // Default subtle float
-    scale = interpolate(frame, [0, durationInFrames], [1, 1.05]);
+    scale = interpolate(frame, [0, durationInFrames], [1, 1.06]);
   }
 
-  // Cross-fade entrance and exit per scene
-  const fadeIn = interpolate(frame, [0, 20], [0, 1], {
+  // Cross-fade transitions
+  const fadeIn = interpolate(frame, [0, 25], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - 20, durationInFrames],
+    [durationInFrames - 25, durationInFrames],
     [1, 0],
     {
       extrapolateLeft: 'clamp',
@@ -95,10 +111,15 @@ const SceneVisual: React.FC<{
   );
   const opacity = Math.min(fadeIn, fadeOut);
 
-  // Visual source path: looks in public/visuals/ or public/
-  const imageSrc = visual.startsWith('http')
-    ? visual
-    : staticFile(`visuals/${visual}`);
+  // Fallback support: if .png was specified in markdown, seamlessly match .svg
+  let resolvedVisual = visual;
+  if (resolvedVisual.endsWith('.png')) {
+    resolvedVisual = resolvedVisual.replace(/\.png$/, '.svg');
+  }
+
+  const imageSrc = resolvedVisual.startsWith('http')
+    ? resolvedVisual
+    : staticFile(`visuals/${resolvedVisual}`);
 
   return (
     <div
@@ -121,10 +142,11 @@ const SceneVisual: React.FC<{
           objectFit: 'cover',
           transform: `scale(${scale}) translate(${translateX}px, ${translateY}px)`,
           transformOrigin: 'center center',
+          filter,
         }}
       />
 
-      {/* Cinematic dark gradient vignette overlay for subtitle readability */}
+      {/* Cinematic dark gradient vignette for enhanced subtitle contrast */}
       <div
         style={{
           position: 'absolute',
@@ -133,7 +155,7 @@ const SceneVisual: React.FC<{
           width: '100%',
           height: '100%',
           background:
-            'linear-gradient(180deg, rgba(10,15,30,0.6) 0%, transparent 35%, rgba(5,8,16,0.3) 60%, rgba(5,8,16,0.92) 100%)',
+            'linear-gradient(180deg, rgba(5,8,16,0.65) 0%, transparent 30%, rgba(5,8,16,0.2) 60%, rgba(5,8,16,0.94) 100%)',
           pointerEvents: 'none',
         }}
       />
@@ -156,7 +178,7 @@ const DynamicSubtitle: React.FC<{
     config: { damping: 14, stiffness: 120 },
   });
 
-  const translateY = interpolate(popSpring, [0, 1], [40, 0]);
+  const translateY = interpolate(popSpring, [0, 1], [35, 0]);
   const opacity = interpolate(popSpring, [0, 1], [0, 1]);
 
   // Fade out before scene ends
@@ -170,13 +192,18 @@ const DynamicSubtitle: React.FC<{
     }
   );
 
+  // Auto-scale subtitle size for long texts (e.g. 250+ characters)
+  const textLength = text.length;
+  const fontSize = textLength > 180 ? 30 : textLength > 120 ? 34 : 40;
+  const lineHeight = textLength > 180 ? 1.3 : 1.35;
+
   return (
     <div
       style={{
         position: 'absolute',
-        bottom: 340, // Positioned safely above TikTok/Reels bottom captions
-        left: 60,
-        right: 60,
+        bottom: 300, // Safe zone above TikTok / Reels bottom interactive UI
+        left: 48,
+        right: 48,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -187,15 +214,15 @@ const DynamicSubtitle: React.FC<{
     >
       <div
         style={{
-          background: 'rgba(15, 23, 42, 0.88)',
+          background: 'rgba(15, 23, 42, 0.92)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1.5px solid rgba(253, 224, 71, 0.4)', // glowing warm yellow accent
+          border: '1.5px solid rgba(253, 224, 71, 0.45)', // glowing warm yellow accent
           boxShadow:
-            '0 20px 48px rgba(0, 0, 0, 0.75), 0 0 24px rgba(253, 224, 71, 0.2)',
+            '0 24px 56px rgba(0, 0, 0, 0.8), 0 0 28px rgba(253, 224, 71, 0.25)',
           borderRadius: 24,
           padding: '24px 36px',
-          maxWidth: '920px',
+          maxWidth: '960px',
           textAlign: 'center',
         }}
       >
@@ -203,12 +230,13 @@ const DynamicSubtitle: React.FC<{
           style={{
             margin: 0,
             fontFamily: FONT_FAMILY.heading,
-            fontSize: 38,
+            fontSize,
             fontWeight: 800,
             color: '#FFFFFF',
-            lineHeight: 1.35,
+            lineHeight,
             letterSpacing: '0.4px',
             textShadow: '0 2px 14px rgba(0,0,0,0.8)',
+            wordBreak: 'break-word',
           }}
         >
           {text}
@@ -243,7 +271,7 @@ export const MainVideo: React.FC<MainVideoProps> = ({
           top: 0,
           left: 0,
           width: '100%',
-          height: 8,
+          height: 10,
           backgroundColor: 'rgba(255, 255, 255, 0.15)',
           zIndex: 50,
         }}
@@ -252,8 +280,8 @@ export const MainVideo: React.FC<MainVideoProps> = ({
           style={{
             height: '100%',
             width: `${progressPercent}%`,
-            background: 'linear-gradient(90deg, #3B82F6, #F59E0B)',
-            boxShadow: '0 0 12px #F59E0B',
+            background: 'linear-gradient(90deg, #3B82F6 0%, #EAB308 100%)',
+            boxShadow: '0 0 14px #EAB308',
           }}
         />
       </div>
@@ -288,9 +316,9 @@ export const MainVideo: React.FC<MainVideoProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                background: 'rgba(15, 23, 42, 0.75)',
+                background: 'rgba(15, 23, 42, 0.85)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
-                padding: '8px 20px',
+                padding: '8px 22px',
                 borderRadius: 999,
               }}
             >

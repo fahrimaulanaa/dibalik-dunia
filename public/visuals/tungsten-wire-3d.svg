@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <radialGradient id="tungstenBg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#2D1503" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#120902" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#050302" stop-opacity="1"/>
+    </radialGradient>
+    <filter id="coiledGlow">
+      <feGaussianBlur stdDeviation="18" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#tungstenBg)"/>
+
+  <!-- Macro Grid Lines -->
+  <line x1="150" y1="0" x2="150" y2="1920" stroke="rgba(255,255,255,0.03)" stroke-width="2"/>
+  <line x1="930" y1="0" x2="930" y2="1920" stroke="rgba(255,255,255,0.03)" stroke-width="2"/>
+
+  <!-- Heavy Support Stems -->
+  <path d="M 280,1400 L 280,820" stroke="#71717A" stroke-width="16" stroke-linecap="round"/>
+  <path d="M 800,1400 L 800,820" stroke="#71717A" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- Tight 3D Coiled Tungsten Spring Structure -->
+  <g filter="url(#coiledGlow)">
+    <!-- Base Coiled Loop Structure -->
+    <path d="M 280,820 
+             Q 340,740 400,820 
+             Q 460,740 520,820 
+             Q 580,740 640,820 
+             Q 700,740 760,820 
+             L 800,820" 
+          fill="none" 
+          stroke="#F59E0B" 
+          stroke-width="24" 
+          stroke-linecap="round"/>
+
+    <!-- Bright Metallic Core Highlight -->
+    <path d="M 280,820 
+             Q 340,740 400,820 
+             Q 460,740 520,820 
+             Q 580,740 640,820 
+             Q 700,740 760,820 
+             L 800,820" 
+          fill="none" 
+          stroke="#FEF08A" 
+          stroke-width="10" 
+          stroke-linecap="round"/>
+  </g>
+
+  <!-- Technical Overlay HUD -->
+  <rect x="220" y="1080" width="640" height="90" rx="16" fill="rgba(24, 24, 27, 0.75)" stroke="#F59E0B" stroke-width="2" stroke-dasharray="6 6"/>
+  <text x="540" y="1135" text-anchor="middle" fill="#FEF08A" font-size="28" font-family="monospace" font-weight="800" letter-spacing="4px">
+    [ATOM 74: TUNGSTEN (W)]
+  </text>
+</svg>
